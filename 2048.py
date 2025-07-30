@@ -7,8 +7,12 @@ from time import time , sleep
 from datetime import datetime
 from pytz import timezone
 from logging import getLogger
+from dotenv import load_dotenv
 
-TOKEN = "YOUR_BOT_TOKEN"
+load_dotenv()
+
+
+TOKEN = os.getenv("TOKEN")
 
 bot = telebot.TeleBot(TOKEN)
 logger = getLogger(__name__)
@@ -16,7 +20,7 @@ message_tracker = {}
 game_state = {}
 leaderboard = {}
 user_data = {}
-ADMIN_USER_IDS = [12345667898] 
+ADMIN_USER_IDS = os.getenv("ADMIN_USER_IDS")
 USERS_FILE = "users.json"
 LEADERBOARD_FILE = "leaderboard.json"
 
