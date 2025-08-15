@@ -4,7 +4,7 @@ from config import logger
 DB_NAME = "bot.db"
 
 def init_db():
-    """Initialize database tables if not exist"""
+    """Create tables if they don't exist"""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
@@ -12,7 +12,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
         username TEXT
-    )""")
+    )
+    """)
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS leaderboard (
@@ -20,24 +21,25 @@ def init_db():
         name TEXT,
         score INTEGER,
         time INTEGER
-    )""")
+    )
+    """)
 
     conn.commit()
     conn.close()
 
 def save_user(user_id, username):
-    """Insert new user into the database if not exists"""
+    """Save new user if not exists"""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE id = ?", (user_id,))
     if cursor.fetchone() is None:
-        cursor.execute("INSERT INTO users (id, username) VALUES (?, ?)", (user_id, username or "N/A"))
-        logger.info(f"User {user_id} saved to database.")
+        cursor.execute("INSERT INTO users (id, username) VALUES (?, ?)", (user_id, username if username else "ندارد"))
+        logger.info(f"Saved user {user_id} to database")
     conn.commit()
     conn.close()
 
 def get_all_users():
-    """Return all users from the database"""
+    """Return all saved users"""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("SELECT id, username FROM users")
@@ -46,7 +48,7 @@ def get_all_users():
     return [{"id": row[0], "username": row[1]} for row in rows]
 
 def get_leaderboard():
-    """Fetch leaderboard from the database"""
+    """Return leaderboard as dict"""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("SELECT user_id, name, score, time FROM leaderboard")
@@ -55,7 +57,7 @@ def get_leaderboard():
     return {str(row[0]): {"name": row[1], "score": row[2], "time": row[3]} for row in rows}
 
 def save_leaderboard_entry(user_id, name, score, time_value):
-    """Insert or update a leaderboard entry"""
+    """Insert or update leaderboard entry"""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("""
